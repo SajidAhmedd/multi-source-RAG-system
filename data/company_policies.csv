@@ -1,0 +1,9 @@
+policy_name,department,description,effective_date
+Remote Work Policy,HR,Employees can work remotely up to 3 days per week. Must be available during core hours 10am-4pm. Manager approval required for full remote positions.,2024-01-01
+Paid Time Off,HR,Full-time employees receive 20 days PTO per year. PTO accrues monthly at 1.67 days. Unused PTO can roll over up to 5 days to next year.,2024-01-01
+Travel Expense Policy,Finance,Business travel must be pre-approved by manager. Economy class for flights under 6 hours. Hotel limit $200/night in major cities. Per diem $75/day for meals.,2024-01-01
+Equipment Policy,IT,New employees receive laptop and monitor. Equipment refresh every 3 years. Personal devices allowed with MDM enrollment. Report lost devices within 24 hours.,2024-01-01
+Code Review Policy,Engineering,All code changes require at least 2 approvals. PRs must include tests with 80% coverage. Security review required for authentication changes.,2024-01-01
+Data Retention Policy,Legal,Customer data retained for 7 years. Employee data retained for 5 years after termination. Marketing data deleted upon unsubscribe request within 30 days.,2024-01-01
+Hiring Policy,HR,All positions must be posted internally for 5 days. Interview panel must include diverse members. Background checks required for all new hires.,2024-01-01
+Security Incident Policy,Security,Report security incidents to security@company.com immediately. Do not attempt to investigate on your own. Preserve all evidence and logs.,2024-01-01

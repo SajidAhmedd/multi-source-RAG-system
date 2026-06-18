@@ -1,0 +1,26 @@
+# Core RAG Framework
+llama-index>=0.12.0
+llama-index-vector-stores-faiss>=0.4.0
+
+# Google GenAI (new package)
+google-genai>=1.0.0
+
+# Document Processing
+pypdf>=5.0.0
+beautifulsoup4>=4.12.0
+requests>=2.31.0
+pandas>=2.0.0
+
+# Vector Store
+faiss-cpu>=1.8.0
+
+# Web Interface
+streamlit>=1.40.0
+
+# Utilities
+python-dotenv>=1.0.0
+tqdm>=4.66.0
+numpy>=1.24.0
+
+# Re-ranking
+sentence-transformers>=3.0.0

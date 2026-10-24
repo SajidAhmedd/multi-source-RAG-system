@@ -1,11 +1,11 @@
 """Response generation with LLM and source citations."""
 
 from typing import List, Tuple
-from google import genai
+from .llm_client import LLMClient
 from llama_index.core import VectorStoreIndex
 from llama_index.core.schema import NodeWithScore
 
-from ..config import GOOGLE_API_KEY, LLM_MODEL, TOP_K_RESULTS
+from ..config import LLM_PROVIDERS, TOP_K_RESULTS
 from ..retrieval.retriever import MultiRetriever
 from ..retrieval.reranker import rerank_results, deduplicate_results
 
@@ -44,20 +44,20 @@ class RAGGenerator:
         self.top_k = top_k
         self.use_reranking = use_reranking
 
-        # Initialize Gemini client with new google-genai package
-        self.client = genai.Client(api_key=GOOGLE_API_KEY)
-        self.model_name = LLM_MODEL
+        # LLM client - tries each provider in LLM_PROVIDERS in order
+        self.client = LLMClient(LLM_PROVIDERS)
+        self.model_name = self.client.model
 
         # Initialize retriever
         self.retriever = MultiRetriever(index, top_k=top_k * 2)
 
     def _generate_response(self, prompt: str) -> str:
-        """Generate response using Gemini."""
-        response = self.client.models.generate_content(
-            model=self.model_name,
-            contents=prompt
+        """Generate response, falling back across providers if one fails."""
+        response = self.client.chat.completions.create(
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.2,
         )
-        return response.text
+        return response.choices[0].message.content
 
     def _format_context(self, nodes: List[NodeWithScore]) -> str:
         """Format retrieved nodes into context string with source info."""

@@ -58,10 +58,13 @@ def get_embedding_model() -> LocalEmbedding:
 def create_index(
     nodes: List[TextNode],
     dimension: int = 384,  # all-MiniLM-L6-v2 produces 384-dim vectors
-    persist_dir: Optional[str] = None
+    persist_dir: Optional[str] = None,
+    persist: bool = True
 ) -> VectorStoreIndex:
     """
     Create a new FAISS vector index from nodes.
+
+    With persist=False the index lives only in memory.
     """
     persist_dir = persist_dir or INDEX_DIR
 
@@ -84,9 +87,10 @@ def create_index(
     )
 
     # Persist to disk
-    os.makedirs(persist_dir, exist_ok=True)
-    index.storage_context.persist(persist_dir=persist_dir)
-    print(f"Index saved to {persist_dir}")
+    if persist:
+        os.makedirs(persist_dir, exist_ok=True)
+        index.storage_context.persist(persist_dir=persist_dir)
+        print(f"Index saved to {persist_dir}")
 
     return index
 

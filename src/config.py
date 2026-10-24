@@ -5,12 +5,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# API Keys
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+# LLM providers, tried in this order (only those with an API key are used).
+# If one is rate-limited or down, the request falls back to the next - see src/llm/llm_client.py.
+# Free keys: https://aistudio.google.com/apikey  https://console.mistral.ai  https://console.groq.com
+LLM_PROVIDERS = os.getenv("LLM_PROVIDERS", "gemini,mistral,groq")
 
-# Model Settings (for google-genai package)
-LLM_MODEL = "gemini-2.0-flash"
-EMBEDDING_MODEL = "models/gemini-embedding-001"
+# Embeddings run locally with sentence-transformers (see src/indexing/vector_store.py)
+EMBEDDING_MODEL = "all-MiniLM-L6-v2"
 
 # Chunking Settings
 CHUNK_SIZE = 1024
@@ -23,3 +24,7 @@ SIMILARITY_THRESHOLD = 0.5
 # Paths
 DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
 INDEX_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "index_storage")
+
+# Save uploaded documents' index to INDEX_DIR. Disabled on the public demo so each
+# visitor's uploads stay in their own session instead of replacing everyone's index.
+PERSIST_INDEX = os.getenv("PERSIST_INDEX", "true").lower() == "true"

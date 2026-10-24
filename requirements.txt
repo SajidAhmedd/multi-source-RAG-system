@@ -2,8 +2,8 @@
 llama-index>=0.12.0
 llama-index-vector-stores-faiss>=0.4.0
 
-# Google GenAI (new package)
-google-genai>=1.0.0
+# LLM providers (Gemini, Mistral, Groq) via their OpenAI-compatible APIs
+openai>=1.40.0
 
 # Document Processing
 pypdf>=5.0.0

@@ -1,0 +1,37 @@
+name: Deploy to Hugging Face Spaces
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  # Visit the demo twice a day so the free Space doesn't go to sleep
+  schedule:
+    - cron: "0 */12 * * *"
+
+env:
+  HF_USER: SajidAhemd
+  HF_SPACE: multi-source-rag-system
+  DEMO_URL: https://rag.sajidahmed.dev
+
+jobs:
+  sync:
+    name: Push to Space
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Push to Hugging Face
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: git push --force "https://${HF_USER}:${HF_TOKEN}@huggingface.co/spaces/${HF_USER}/${HF_SPACE}" HEAD:main
+
+  keep-warm:
+    name: Keep demo awake
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping demo
+        run: curl -sS -o /dev/null -w "%{http_code}\n" --max-time 120 "$DEMO_URL" || true

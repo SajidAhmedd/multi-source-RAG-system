@@ -22,10 +22,12 @@ st.set_page_config(
 # Try imports with error handling
 try:
     from src.ingestion import load_pdfs, load_csvs, load_urls
+    from src.ingestion.csv_loader import load_csvs_from_directory
     from src.processing import process_documents, chunk_documents
     from src.indexing import create_index, load_index
     from src.llm import RAGGenerator
-    from src.config import INDEX_DIR, GOOGLE_API_KEY
+    from src.llm.llm_client import configured_providers
+    from src.config import DATA_DIR, INDEX_DIR, LLM_PROVIDERS, PERSIST_INDEX
 except Exception as e:
     st.error(f"Import Error: {e}")
     st.code(str(e))
@@ -33,11 +35,25 @@ except Exception as e:
 
 
 def check_api_key():
-    """Check if API key is configured."""
-    if not GOOGLE_API_KEY:
-        st.error("⚠️ Please set your GOOGLE_API_KEY in the .env file")
-        st.info("Get your free API key at: https://aistudio.google.com/apikey")
+    """Check that at least one LLM provider has an API key."""
+    if not configured_providers(LLM_PROVIDERS):
+        st.error("⚠️ Please set GEMINI_API_KEY, MISTRAL_API_KEY or GROQ_API_KEY in the .env file")
+        st.info("Free keys: https://aistudio.google.com/apikey · https://console.mistral.ai · https://console.groq.com")
         st.stop()
+
+
+@st.cache_resource(show_spinner="Indexing sample data...")
+def get_sample_index():
+    """Build an in-memory index of the bundled sample CSVs, shared by all sessions."""
+    documents = process_documents(load_csvs_from_directory(DATA_DIR))
+    return create_index(chunk_documents(documents), persist=False)
+
+
+def load_sample_data():
+    """Point this session at the shared sample index."""
+    st.session_state.index = get_sample_index()
+    st.session_state.generator = RAGGenerator(st.session_state.index)
+    st.session_state.documents_loaded = True
 
 
 def init_session_state():
@@ -117,12 +133,18 @@ def main():
         with st.sidebar:
             st.header("📁 Data Sources")
 
-            # Try to load existing index
             if not st.session_state.documents_loaded:
-                if st.button("Load Existing Index"):
-                    if load_existing_index():
-                        st.success("Index loaded successfully!")
-                        st.rerun()
+                if st.button("Try Sample Data", type="primary"):
+                    load_sample_data()
+                    st.rerun()
+                st.caption("Company policies and a product catalog (CSV)")
+
+                # Try to load existing index
+                if PERSIST_INDEX and os.path.exists(INDEX_DIR):
+                    if st.button("Load Existing Index"):
+                        if load_existing_index():
+                            st.success("Index loaded successfully!")
+                            st.rerun()
 
             st.divider()
 
@@ -170,7 +192,7 @@ def main():
 
                                 # Create index
                                 with st.spinner("Creating vector index..."):
-                                    st.session_state.index = create_index(nodes)
+                                    st.session_state.index = create_index(nodes, persist=PERSIST_INDEX)
                                     st.session_state.generator = RAGGenerator(st.session_state.index)
                                     st.session_state.documents_loaded = True
 
@@ -252,7 +274,7 @@ def main():
 
         else:
             # Welcome message
-            st.info("👈 Upload documents in the sidebar to get started!")
+            st.info("👈 Click **Try Sample Data** or upload documents in the sidebar to get started!")
 
             st.markdown("""
             ### How to use:

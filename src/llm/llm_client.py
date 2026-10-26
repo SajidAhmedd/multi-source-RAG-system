@@ -61,7 +61,7 @@ PROVIDERS = {
         base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
         api_key_vars=["GEMINI_API_KEY", "GOOGLE_API_KEY"],
         model_var="GEMINI_MODEL",
-        default_model="gemini-flash-latest",
+        default_model="gemini-3-flash-preview",
     ),
     "mistral": Provider(
         name="mistral",
@@ -122,8 +122,9 @@ class LLMClient:
             if provider is None:
                 raise ValueError(f"Unknown LLM provider '{name}'. Use: {', '.join(PROVIDERS)}")
             if provider.api_key:
-                # Fail over quickly instead of waiting on long retry loops
-                client = OpenAI(api_key=provider.api_key, base_url=provider.base_url, max_retries=1, timeout=90)
+                # Fail over quickly: a slow or rate-limited provider hands off to the next one
+                # instead of the visitor waiting on retries (the fallback is the retry)
+                client = OpenAI(api_key=provider.api_key, base_url=provider.base_url, max_retries=0, timeout=30)
                 self.providers.append((provider, client))
 
         if not self.providers:

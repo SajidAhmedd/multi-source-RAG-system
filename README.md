@@ -94,7 +94,7 @@ docker run -p 7860:7860 --env-file .env multi-source-rag
 |----------|---------|---------|
 | `LLM_PROVIDERS` | `gemini,mistral,groq` | Order in which LLM providers are tried |
 | `GEMINI_API_KEY` / `MISTRAL_API_KEY` / `GROQ_API_KEY` | — | Provider keys; set at least one |
-| `GEMINI_MODEL` / `MISTRAL_MODEL` / `GROQ_MODEL` | `gemini-flash-latest` / `mistral-small-latest` / `openai/gpt-oss-20b` | Model per provider |
+| `GEMINI_MODEL` / `MISTRAL_MODEL` / `GROQ_MODEL` | `gemini-3-flash-preview` / `mistral-small-latest` / `openai/gpt-oss-20b` | Model per provider |
 | `PERSIST_INDEX` | `true` (`false` in Docker) | Save the uploaded documents' index to `index_storage/` |
 
 Chunk size, overlap and retrieval depth are in `src/config.py`.

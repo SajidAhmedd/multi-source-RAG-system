@@ -10,7 +10,7 @@ on:
 
 env:
   HF_USER: SajidAhemd
-  HF_SPACE: multi-source-rag-system
+  HF_SPACE: multi-source-RAG-system
   DEMO_URL: https://rag.sajidahmed.dev
 
 jobs:
